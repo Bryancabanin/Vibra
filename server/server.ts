@@ -44,4 +44,4 @@ app.listen(PORT, () => {
 
 app.use('/playlists', playlistRoutes);
 
-module.exports = app;
+export default app;
