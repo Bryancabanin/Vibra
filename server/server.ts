@@ -1,5 +1,15 @@
 import express from 'express';
 import cors from 'cors';
+import {
+  notFoundMiddleware,
+  errorHandler,
+} from './middlewares/errorMiddleware';
+import session from 'express-session';
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
+import configurePassport from './config/passportConfig';
+import authRoutes from './routes/authRoutes';
+import 'dotenv/config';
 
 const app = express();
 const PORT = 8080;
@@ -10,32 +20,45 @@ app.use(
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // Allow cookies and credentials
-  })
+  }),
 );
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.get('/', (req, res) => {
-  res.send('test');
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  }),
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Configure Passport strategies
+configurePassport();
+
+// API routes
+app.use('/api/auth', authRoutes);
+
+// Other routes
+app.get('/', (_req, res) => {
+  res.send('Spotify API Server is running');
 });
 
-app.use('*', (req, res, next) => {
-  const err = new Error('test');
-  res.status(500);
-  next(err);
-});
+// 404 or "Not Found" Handler
+app.use(notFoundMiddleware);
 
-app.use((err, req, res, next) => {
-  const defaultErr = {
-    log: 'Express error handler caught unknown middleware error',
-    status: 500,
-    message: { err: 'An error has occured' },
-  };
-  const errorObj = Object.assign({}, defaultErr, err);
-
-  console.log(errorObj.log);
-
-  return res.status(errorObj.status).json(errorObj.message);
-});
+// 500 or "Internal Server Error" Handler
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);

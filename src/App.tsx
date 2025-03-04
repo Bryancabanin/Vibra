@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router';
 import Login from './components/Login';
 import SpotifyCallback from './components/SpotifyCallback';
+import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard';
 
 function App() {
@@ -12,6 +13,14 @@ function App() {
         <Route path='/callback' element={<SpotifyCallback />} />
         <Route path='/dashboard' element={<Dashboard />} />
         {/* Protected routes*/}
+        <Route
+          path='/dashboard'
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );
