@@ -36,13 +36,13 @@ const SpotifyCallback: React.FC = () => {
         if (!code) {
           const error = urlParams.get('error');
           throw new Error(
-            error || 'No authorization code received from Spotify'
+            error || 'No authorization code received from Spotify',
           );
         }
 
         // exchange code for tokens with our backend
         const response = await axios.get(
-          `https://localhost:8080/auth/spotify/callback${location.search}`
+          `https://localhost:8080/api/auth/spotify/callback${location.search}`,
         );
 
         // store the tokens in localStorage
@@ -51,7 +51,7 @@ const SpotifyCallback: React.FC = () => {
           localStorage.setItem('refreshToken', response.data.refreshToken);
           localStorage.setItem(
             'expiresIn',
-            (Date.now() + response.data.expiresIn * 1000).toString() // date now is in ms while expires in is seconds. Expires in is 3600 seconds = 60 mins. We have to convert this into ms so we multiple by 1000 since 1 second is 1000 ms. Then use toString for localStorage.
+            (Date.now() + response.data.expiresIn * 1000).toString(), // date now is in ms while expires in is seconds. Expires in is 3600 seconds = 60 mins. We have to convert this into ms so we multiple by 1000 since 1 second is 1000 ms. Then use toString for localStorage.
           );
           navigate('/dashboard'); // make sure this matches the endpoint with the person who is making the dashboard.
         } else {

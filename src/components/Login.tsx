@@ -26,7 +26,7 @@ const darkTheme = createTheme({
 
 // create handler for Spotify Login
 const handleSpotifyLogin = () => {
-  window.location.href = 'https://localhost:8080/auth/spotify';
+  window.location.href = import.meta.env.VITE_REDIRECT_URI;
 };
 
 const Login: React.FC = () => {

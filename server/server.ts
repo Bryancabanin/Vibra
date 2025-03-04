@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import configurePassport from './config/passportConfig';
 import authRoutes from './routes/authRoutes';
 import 'dotenv/config';
+import playlistRoutes from './routes/playlistRoutes';
 
 const app = express();
 const PORT = 8080;
@@ -63,5 +64,7 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);
 });
+
+app.use('/playlists', playlistRoutes);
 
 export default app;
