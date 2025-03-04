@@ -13,3 +13,24 @@ CREATE TABLE playlists (
 );
 
 
+-- Albums table
+CREATE TABLE albums (
+  id TEXT PRIMARY KEY,  -- Spotify album ID
+  name TEXT NOT NULL,
+  image_url TEXT
+);
+
+-- Artists table
+CREATE TABLE artists (
+  id TEXT PRIMARY KEY,  -- Spotify artist ID
+  name TEXT NOT NULL
+);
+
+-- Tracks table
+CREATE TABLE tracks (
+  id TEXT PRIMARY KEY,  -- Spotify track ID
+  name TEXT NOT NULL,
+  album_id TEXT REFERENCES albums(id) ON DELETE CASCADE,
+  duration_ms INT NOT NULL,
+  preview_url TEXT
+);
