@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { supabase } from './supabaseClient';
+import  supabase  from '../supabaseClient';
 
 interface Playlist {
   id: string;
