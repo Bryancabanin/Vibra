@@ -9,7 +9,7 @@ interface Playlist {
 }
 
 //Fetch/query all playlist
-export const getPlaylists = async (req: Request, res: Response) => {
+export const getPlaylists = async (_req: Request, res: Response) => {
   try {
     const { data, error } = await supabase.from('playlists').select('*');
     if (error) throw error;
