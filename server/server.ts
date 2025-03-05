@@ -11,6 +11,8 @@ import configurePassport from './config/passportConfig';
 import authRoutes from './routes/authRoutes';
 import 'dotenv/config';
 import playlistRoutes from './routes/playlistRoutes';
+import spotifyRoutes from './routes/spotifyRoutes';
+
 
 const app = express();
 const PORT = 8080;
@@ -21,7 +23,7 @@ app.use(
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // Allow cookies and credentials
-  }),
+  })
 );
 
 app.use(express.json());
@@ -37,7 +39,7 @@ app.use(
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
-  }),
+  })
 );
 
 // Initialize Passport
@@ -49,10 +51,24 @@ configurePassport();
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/spotify', spotifyRoutes);
 
-// Other routes
-app.get('/', (_req, res) => {
-  res.send('Spotify API Server is running');
+app.get('/access-token', (req, res) => {
+  res.json({ accessToken: req.user?.accessToken });
+});
+
+// Add this to your server.ts file before the error handlers
+app.get('/debug-session', (req, res) => {
+  console.log('Session ID:', req.sessionID);
+  console.log('Is authenticated:', req.isAuthenticated());
+  console.log('User object:', req.user);
+  
+  res.json({
+    authenticated: req.isAuthenticated(),
+    sessionID: req.sessionID,
+    // Only include user info if authenticated
+    user: req.isAuthenticated() ? req.user : null
+  });
 });
 
 // 404 or "Not Found" Handler
