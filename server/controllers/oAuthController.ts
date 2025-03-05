@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import type { SpotifyUser } from '../types/spotifyUser.d.ts';
+import 'dotenv/config';
 
 // Interface for the authentication call.
 interface SpotifyAuthOptions extends passport.AuthenticateOptions {
@@ -14,7 +15,7 @@ interface SpotifyAuthOptions extends passport.AuthenticateOptions {
 export const spotifyLogin = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const options: SpotifyAuthOptions = {
     scope: [
@@ -43,7 +44,7 @@ export const spotifyLogin = (
 export const spotifyCallback = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   // passport.authenticate('spotify', { failureRedirect: '/login' })(
   passport.authenticate('spotify', { failureRedirect: '/' })(req, res, next);
@@ -56,7 +57,7 @@ export const spotifyCallback = (
 export const spotifyCallbackSuccess = (req: Request, res: Response) => {
   // Log successful authentication
   console.log('Authentication successful for user:', req.user);
-  res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
+  res.redirect(process.env.FRONT_END_URL || 'http://localhost:5173');
 };
 
 /**
@@ -72,7 +73,7 @@ export const logout = (req: Request, res: Response) => {
       if (err) {
         console.error('Error destroying session:', err);
       }
-      res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
+      res.redirect(process.env.FRONT_END_URL || 'http://localhost:5173');
     });
   });
 };
@@ -84,7 +85,7 @@ export const logout = (req: Request, res: Response) => {
 export const ensureAuthenticated = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   if (req.isAuthenticated()) {
     return next();
