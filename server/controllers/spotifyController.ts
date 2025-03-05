@@ -49,7 +49,7 @@ export const getUserPlaylists = async (
       res
         .status(401)
         .json({ error: 'Unauthorized: No access token found' });
-        return next();
+        return;
     }
 
     const response = await axios.get(
@@ -76,7 +76,7 @@ export const getTracks = async (
     const trackId = req.params.id;
     if (!trackId) {
        res.status(400).json({ error: 'Track id is required' });
-       return next();
+       return;
     }
 
     // Cast req.user as SpotifyUser to access the accessToken property
@@ -113,7 +113,7 @@ export const getGenresFromArtist = async (
     const artistId = req.params.id;
     if (!artistId) {
       res.status(400).json({ error: 'Artist id is required' });
-      return next();
+      return;
     }
 
     // Cast req.user as SpotifyUser to access the accessToken property
