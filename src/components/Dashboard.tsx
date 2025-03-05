@@ -16,7 +16,11 @@ import PlaylistList from './PlaylistList';
 import TrackList from './TrackList.tsx';
 import GenreSortView from './GenreSortView.tsx';
 import { darkTheme } from '../theme.ts';
-import type { Playlist, Track } from '../types.ts';
+import type { Playlist } from '../types.ts';
+import { 
+  Route, 
+  Routes,   
+} from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<any>(null);
