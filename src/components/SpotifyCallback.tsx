@@ -24,36 +24,23 @@ const darkTheme = createTheme({
 
 const SpotifyCallback: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const urlParams = new URLSearchParams(location.search); // access the part of the query string after the ?
-        const code = urlParams.get('code');
-
-        if (!code) {
-          const error = urlParams.get('error');
-          throw new Error(
-            error || 'No authorization code received from Spotify',
-          );
-        }
-
-        // exchange code for tokens with our backend
+        // Instead of expecting tokens in the response,
+        // check if the user is authenticated by making a request to your user endpoint
         const response = await axios.get(
-          `https://localhost:8080/api/auth/spotify/callback${location.search}`,
+          'http://localhost:8080/api/auth/user',
+          {
+            withCredentials: true, // This is crucial for sending cookies with the request
+          }
         );
 
-        // store the tokens in localStorage
-        if (response.data.accessToken) {
-          localStorage.setItem('accessToken', response.data.accessToken);
-          localStorage.setItem('refreshToken', response.data.refreshToken);
-          localStorage.setItem(
-            'expiresIn',
-            (Date.now() + response.data.expiresIn * 1000).toString(), // date now is in ms while expires in is seconds. Expires in is 3600 seconds = 60 mins. We have to convert this into ms so we multiple by 1000 since 1 second is 1000 ms. Then use toString for localStorage.
-          );
-          navigate('/dashboard'); // make sure this matches the endpoint with the person who is making the dashboard.
+        if (response.data && response.data.id) {
+          // User is authenticated, navigate to dashboard
+          navigate('/dashboard');
         } else {
           throw new Error('Authentication failed.');
         }
@@ -65,7 +52,7 @@ const SpotifyCallback: React.FC = () => {
       }
     };
     handleCallback();
-  }, [location.search, navigate]);
+  }, [navigate]);
 
   return (
     <ThemeProvider theme={darkTheme}>
