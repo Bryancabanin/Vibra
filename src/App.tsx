@@ -1,28 +1,33 @@
-import { Route, Routes } from 'react-router';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
 import Login from './components/Login';
 import SpotifyCallback from './components/SpotifyCallback';
-import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+import NotFound from './components/NotFound.tsx';
+import { darkTheme } from './theme.ts';
 
 function App() {
   return (
-    <div>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
       <Routes>
         {/* Auth routes*/}
-        <Route path='/' element={<Login />} />
-        <Route path='/callback' element={<SpotifyCallback />} />
-        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/callback" element={<SpotifyCallback />} />
+        {/* <Route path='/dashboard' element={<Dashboard />} /> */}
         {/* Protected routes*/}
-        <Route
-          path='/dashboard'
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />}>
+            <Route index element={<Navigate to="." replace />} />
+            <Route path=":playlistId" element={<Dashboard />} />
+            <Route path=":playlistId/sort" element={<Dashboard />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
-    </div>
+    </ThemeProvider>
   );
 }
 
