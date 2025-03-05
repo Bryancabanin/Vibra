@@ -22,6 +22,12 @@ export default function configurePassport() {
         callbackURL: process.env.VITE_REDIRECT_URI!,
       },
       (accessToken, refreshToken, expires_in, profile, done) => {
+        console.log('Spotify auth callback received:');
+        console.log('- Access Token:', accessToken ? 'Present (hidden for security)' : 'Missing');
+        console.log('- Refresh Token:', refreshToken ? 'Present (hidden for security)' : 'Missing');
+        console.log('- Expires In:', expires_in);
+        console.log('- Profile ID:', profile.id);
+        console.log('- Display Name:', profile.displayName);
         const user: SpotifyUser = {
           id: profile.id,
           spotifyId: profile.id,
@@ -33,10 +39,18 @@ export default function configurePassport() {
           refreshToken,
           expires_in,
         };
-
+        console.log('Created user object with accessToken:', user.accessToken ? 'Present' : 'Missing');
+        
         // Store tokens in the session for later use
         return done(null, user);
-      },
-    ),
+      }
+    )
   );
+}
+
+// Extend Express.User interface
+declare global {
+  namespace Express {
+    interface User extends SpotifyUser {}
+  }
 }
