@@ -58,7 +58,7 @@ export const getUserPlaylists = async (
         headers: { Authorization: `Bearer ${user.accessToken}` },
       }
     );
-    res.locals.userPlaylist = response.data;
+    res.locals.userPlaylist = response.data.items;
     return next();
   } catch (error) {
     console.error('Error fetching user playlists:', error);
@@ -137,4 +137,41 @@ export const getGenresFromArtist = async (
     console.error('Error fetching artist data:', error);
     return next(error);
   }
+};
+
+// create song for each genre
+export const createPlaylist = async (accessToken: string, genre: string) => {
+  const response = await fetch('https://api.spotify.com/v1/me', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  const user = await response.json();
+
+  const createPlaylistResponse = await fetch(`https://api.spotify.com/v1/users/${user.id}/playlists`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: `${genre} Playlist`,
+      description: `A playlist with ${genre} music.`,
+      public: false,
+    }),
+  });
+  const newPlaylist = await createPlaylistResponse.json();
+  return newPlaylist.id;
+};
+
+export const getGenreRecommendations = async (genre: string, accessToken: string) => {
+  const response = await fetch(`https://api.spotify.com/v1/recommendations?seed_genres=${genre}&limit=10`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  const recommendations = await response.json();
+  return recommendations.tracks; // Array of recommended tracks
 };
