@@ -11,15 +11,8 @@ function App() {
         {/* Auth routes*/}
         <Route path='/' element={<Login />} />
         <Route path='/callback' element={<SpotifyCallback />} />
+        <Route path='/dashboard' element={<Dashboard />} />
         {/* Protected routes*/}
-        <Route
-          path='/dashboard'
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
       </Routes>
     </div>
   );
