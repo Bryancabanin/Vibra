@@ -6,7 +6,7 @@ import type { SpotifyUser } from '../types/spotifyUser.ts';
 export const getCurrentUserProfile = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     // Cast req.user as SpotifyUser to access the accessToken property
@@ -26,7 +26,7 @@ export const getCurrentUserProfile = async (
     // Make sure we have the spotify ID in both places
     if (user.id !== response.data.id) {
       console.log(
-        `Note: User ID mismatch between session (${user.id}) and Spotify API (${response.data.id})`
+        `Note: User ID mismatch between session (${user.id}) and Spotify API (${response.data.id})`,
       );
     }
 
@@ -42,90 +42,10 @@ export const getCurrentUserProfile = async (
   }
 };
 
-// export const fetchPlaylistTracks = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const playlistId = req.params.id;
-//     if (!playlistId) {
-//       res.status(400).json({ error: 'Playlist ID is required' });
-//       return;
-//     }
-
-//     // Cast req.user as SpotifyUser to access the accessToken property
-//     const user = req.user as SpotifyUser;
-//     if (!user || !user.accessToken) {
-//       res.status(401).json({ error: 'Unauthorized: No access token found' });
-//       return;
-//     }
-
-//     const response = await axios.get(
-//       `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-//       {
-//         headers: { Authorization: `Bearer ${user.accessToken}` },
-//       }
-//     );
-
-//     // Store the tracks in res.locals for the next middleware or route handler
-//     res.locals.playlistTracks = response.data.items;
-//     return next();
-//   } catch (error) {
-//     console.error('Error fetching playlist tracks:', error);
-//     next(error);
-//   }
-// };
-
-//
-// export const fetchPlaylistTracks = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const playlistId = req.params.id;
-//     if (!playlistId) {
-//       res.status(400).json({ error: 'Playlist ID is required' });
-//       return;
-//     }
-
-//     // Get pagination parameters from the request
-//     const limit = parseInt(req.query.limit as string) || 100;
-//     const offset = parseInt(req.query.offset as string) || 0;
-
-//     // Cast req.user as SpotifyUser to access the accessToken property
-//     const user = req.user as SpotifyUser;
-//     if (!user || !user.accessToken) {
-//       res.status(401).json({ error: 'Unauthorized: No access token found' });
-//       return;
-//     }
-
-//     const response = await axios.get(
-//       `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-//       {
-//         params: {
-//           limit,
-//           offset,
-//           market: 'from_token',
-//         },
-//         headers: { Authorization: `Bearer ${user.accessToken}` },
-//       }
-//     );
-
-//     // Store the tracks in res.locals for the next middleware or route handler
-//     res.locals.playlistTracks = response.data;
-//     return next();
-//   } catch (error) {
-//     console.error('Error fetching playlist tracks:', error);
-//     next(error);
-//   }
-// };
-
 export const fetchPlaylistTracks = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const playlistId = req.params.id;
@@ -147,11 +67,11 @@ export const fetchPlaylistTracks = async (
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`,
       {
         headers: { Authorization: `Bearer ${user.accessToken}` },
-      }
+      },
     );
 
     console.log(
-      `Spotify API returned ${response.data.items?.length || 0} tracks`
+      `Spotify API returned ${response.data.items?.length || 0} tracks`,
     );
     console.log('Total tracks in playlist:', response.data.total);
 
@@ -167,7 +87,7 @@ export const fetchPlaylistTracks = async (
 export const getUserPlaylists = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     // Cast req.user as SpotifyUser to access the accessToken property
@@ -182,7 +102,7 @@ export const getUserPlaylists = async (
       `https://api.spotify.com/v1/me/playlists?limit=50`,
       {
         headers: { Authorization: `Bearer ${user.accessToken}` },
-      }
+      },
     );
 
     // Debugging logs
@@ -197,7 +117,7 @@ export const getUserPlaylists = async (
       const firstPlaylist = response.data.items[0];
       if (firstPlaylist.owner) {
         console.log(
-          `First playlist: "${firstPlaylist.name}" owned by: ${firstPlaylist.owner.display_name} (ID: ${firstPlaylist.owner.id})`
+          `First playlist: "${firstPlaylist.name}" owned by: ${firstPlaylist.owner.display_name} (ID: ${firstPlaylist.owner.id})`,
         );
       }
 
@@ -215,97 +135,11 @@ export const getUserPlaylists = async (
     next(error);
   }
 };
-///
-// export const getUserPlaylists = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const user = req.user as SpotifyUser;
-//     if (!user || !user.accessToken) {
-//       res.status(401).json({ error: 'Unauthorized: No access token found' });
-//       return;
-//     }
 
-//     // First get the user's actual Spotify ID
-//     const userProfileResponse = await axios.get(
-//       `https://api.spotify.com/v1/me`,
-//       {
-//         headers: { Authorization: `Bearer ${user.accessToken}` },
-//       }
-//     );
-
-//     const userId = userProfileResponse.data.id;
-//     console.log(`Fetching playlists for user ID: ${userId}`);
-
-//     // Use the specific endpoint to get only playlists OWNED by the user
-//     const response = await axios.get(
-//       `https://api.spotify.com/v1/users/${userId}/playlists?limit=50`,
-//       {
-//         headers: { Authorization: `Bearer ${user.accessToken}` },
-//       }
-//     );
-
-//     console.log(`Found ${response.data.items?.length || 0} owned playlists`);
-//     res.locals.userPlaylist = response.data;
-//     return next();
-//   } catch (error) {
-//     console.error('Error fetching user playlists:', error);
-//     next(error);
-//   }
-// };
-
-// export const getUserPlaylists = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const user = req.user as SpotifyUser;
-//     if (!user || !user.accessToken) {
-//       res.status(401).json({ error: 'Unauthorized: No access token found' });
-//       return;
-//     }
-
-//     // Get both the playlists the user owns and the playlists they follow
-//     console.log(`Fetching playlists for user with access token`);
-//     const response = await axios.get(
-//       `https://api.spotify.com/v1/me/playlists?limit=50`,
-//       {
-//         headers: { Authorization: `Bearer ${user.accessToken}` },
-//       }
-//     );
-
-//     // Debug logging
-//     console.log(`API Response status: ${response.status}`);
-//     console.log(`Response data type: ${typeof response.data}`);
-//     console.log(`Response data has items: ${Boolean(response.data?.items)}`);
-//     console.log(`Found ${response.data?.items?.length || 0} playlists total`);
-
-//     // Set the response
-//     res.locals.userPlaylist = response.data;
-//     return next();
-//   } catch (error) {
-//     console.error('Error fetching user playlists:', error);
-//     if (axios.isAxiosError(error)) {
-//       console.error('Axios error details:', error.response?.data);
-//       res.status(error.response?.status || 500).json({
-//         error: 'Error fetching playlists',
-//         details: error.response?.data,
-//       });
-//     } else {
-//       next(error);
-//     }
-//   }
-// };
-
-// test
-// In your spotifyController.js:
 export const getPlaylist = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const playlistId = req.params.id;
@@ -324,7 +158,7 @@ export const getPlaylist = async (
       `https://api.spotify.com/v1/playlists/${playlistId}`,
       {
         headers: { Authorization: `Bearer ${user.accessToken}` },
-      }
+      },
     );
 
     res.locals.playlist = response.data;
@@ -338,7 +172,7 @@ export const getPlaylist = async (
 export const getTracks = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     // Expect the track id to be provided in the route parameter: /tracks/:id
@@ -359,7 +193,7 @@ export const getTracks = async (
       `https://api.spotify.com/v1/tracks/${trackId}`,
       {
         headers: { Authorization: `Bearer ${user.accessToken}` },
-      }
+      },
     );
     res.locals.getTracks = response.data;
     return next();
@@ -373,7 +207,7 @@ export const getTracks = async (
 export const getGenresFromArtist = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     // Expect the artist id to be provided in the route parameter: /artists/:id
@@ -394,7 +228,7 @@ export const getGenresFromArtist = async (
       `https://api.spotify.com/v1/artists/${artistId}`,
       {
         headers: { Authorization: `Bearer ${user.accessToken}` },
-      }
+      },
     );
 
     res.locals.genres = response.data.genres;
@@ -407,7 +241,7 @@ export const getGenresFromArtist = async (
 export const getArtist = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     // Expect the artist id to be provided in the route parameter: /artists/:id
@@ -428,7 +262,7 @@ export const getArtist = async (
       `https://api.spotify.com/v1/artists/${artistId}`,
       {
         headers: { Authorization: `Bearer ${user.accessToken}` },
-      }
+      },
     );
 
     res.locals.artist = response.data;
@@ -461,7 +295,7 @@ export const createPlaylist = async (accessToken: string, genre: string) => {
         description: `A playlist with ${genre} music.`,
         public: false,
       }),
-    }
+    },
   );
   const newPlaylist = await createPlaylistResponse.json();
   return newPlaylist.id;
@@ -471,7 +305,7 @@ export const createPlaylist = async (accessToken: string, genre: string) => {
 export const createGenrePlaylist = async (
   accessToken: string,
   genre: string,
-  userId: string
+  userId: string,
 ) => {
   try {
     const createPlaylistResponse = await axios.post(
@@ -486,7 +320,7 @@ export const createGenrePlaylist = async (
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     return createPlaylistResponse.data.id;
@@ -500,7 +334,7 @@ export const createGenrePlaylist = async (
 export const createGenrePlaylists = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const { genres, tracks } = req.body;
@@ -537,7 +371,7 @@ export const createGenrePlaylists = async (
       const playlistId = await createGenrePlaylist(
         user.accessToken,
         genre,
-        userId
+        userId,
       );
 
       // Find tracks for this genre
@@ -555,7 +389,7 @@ export const createGenrePlaylists = async (
               Authorization: `Bearer ${user.accessToken}`,
               'Content-Type': 'application/json',
             },
-          }
+          },
         );
       }
 
@@ -576,17 +410,153 @@ export const createGenrePlaylists = async (
 
 export const getGenreRecommendations = async (
   genre: string,
-  accessToken: string
+  accessToken: string,
 ) => {
-  const response = await fetch(
-    `https://api.spotify.com/v1/recommendations?seed_genres=${genre}&limit=10`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+  try {
+    const response = await axios.get(
+      `https://api.spotify.com/v1/recommendations`,
+      {
+        params: {
+          seed_genres: genre,
+          limit: 10,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    
+    return response.data.tracks || []; // Return the tracks array directly
+  } catch (error) {
+    console.error(`Error getting recommendations for genre ${genre}:`, error);
+    if (axios.isAxiosError(error)) {
+      console.error('Spotify API error details:', error.response?.data);
     }
-  );
-  const recommendations = await response.json();
-  return recommendations.tracks; // Array of recommended tracks
+    return [];
+  }
+};
+
+export const getRecommendations = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    console.log("getRecommendations called with query:", req.query);
+    
+    // Validate user authentication
+    const user = req.user as SpotifyUser;
+    if (!user || !user.accessToken) {
+      console.log("No authenticated user or missing access token");
+      res.status(401).json({ error: 'Unauthorized: No access token found' });
+      return;
+    }
+
+    console.log(`User authenticated, access token present (length: ${user.accessToken.length})`);
+    
+    // Get parameters from query
+    const genre = req.query.genre as string;
+    const artistIds = req.query.artistIds as string;
+    
+    // Build request parameters
+    let params: any = {
+      limit: 10
+    };
+    
+    // Add seed parameters - need at least one seed
+    let hasSeed = false;
+    
+    if (artistIds && artistIds.length > 0) {
+      params.seed_artists = artistIds;
+      console.log(`Using seed_artists=${artistIds}`);
+      hasSeed = true;
+    }
+    
+    if (genre && genre !== 'unknown') {
+      params.seed_genres = genre;
+      console.log(`Using seed_genres=${genre}`);
+      hasSeed = true;
+    }
+    
+    // If no valid seeds provided, use pop as a fallback
+    if (!hasSeed) {
+      params.seed_genres = 'pop';
+      console.log('No valid seeds provided, using pop as fallback genre');
+    }
+    
+    console.log("Making Spotify API request with params:", params);
+    
+    try {
+      // Make the API call with appropriate seeds
+      const response = await axios({
+        method: 'get',
+        url: 'https://api.spotify.com/v1/recommendations',
+        params: params,
+        headers: { 
+          'Authorization': `Bearer ${user.accessToken}`,
+          'Content-Type': 'application/json' 
+        },
+        timeout: 10000 // 10 second timeout
+      });
+      
+      console.log(`Received ${response.data.tracks?.length || 0} recommendations from Spotify API`);
+      
+      // Store the tracks
+      res.locals.recommendations = response.data.tracks || [];
+      return next();
+    } catch (spotifyError) {
+      console.error('Error from Spotify API:', spotifyError);
+      
+      if (axios.isAxiosError(spotifyError)) {
+        console.error('Response status:', spotifyError.response?.status);
+        console.error('Response data:', spotifyError.response?.data);
+        
+        // Handle potential token expiration
+        if (spotifyError.response?.status === 401) {
+          res.status(401).json({
+            error: 'Spotify token expired',
+            message: 'Your session has expired. Please log out and log back in.'
+          });
+          return;
+        }
+        
+        // Try to recover if the genre seed is invalid
+        if (spotifyError.response?.status === 400 && genre && params.seed_genres === genre) {
+          console.log('Attempting recovery with pop genre after error');
+          try {
+            // Retry with pop genre
+            const recoveryResponse = await axios.get(
+              'https://api.spotify.com/v1/recommendations',
+              {
+                params: {
+                  seed_genres: 'pop',
+                  limit: 10
+                },
+                headers: { Authorization: `Bearer ${user.accessToken}` }
+              }
+            );
+            
+            console.log(`Recovery successful, got ${recoveryResponse.data.tracks?.length || 0} tracks`);
+            res.locals.recommendations = recoveryResponse.data.tracks || [];
+            return next();
+          } catch (recoveryError) {
+            console.error('Recovery attempt failed:', recoveryError);
+          }
+        }
+      }
+      
+      // Pass detailed error to next error handler
+      const error = new Error(
+        `Spotify API error: ${
+          axios.isAxiosError(spotifyError) && spotifyError.response?.data?.error?.message
+            ? spotifyError.response.data.error.message
+            : spotifyError.message
+        }`
+      );
+      return next(error);
+    }
+  } catch (error) {
+    console.error('Error in getRecommendations:', error);
+    next(error);
+  }
 };
